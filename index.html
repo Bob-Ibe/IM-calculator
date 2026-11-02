@@ -58,6 +58,32 @@ body { margin:0; background:var(--bg); color:var(--text); font:15px/1.55 Manrope
 .qr-note svg { width:78px; height:60px; margin-right:18px; }
 .qr-note { opacity:0; transform:translateY(-6px); }
 .qr-tree .qr-note.show { opacity:1; transform:none; } /* alleen even na een klik op de boom */
+.only-touch { display:none; }
+
+/* Telefoon: grotere knoppen voor de duim, geen inzoomen bij typen, appknop in plaats van scannen */
+@media (pointer:coarse) {
+  .step button { width:40px; height:40px; font-size:18px; }
+  .eur input { font-size:16px; }
+  .only-touch { display:block; }
+  a.only-touch { display:inline-block; }
+  .only-mouse { display:none; }
+  .contact .cta { margin-bottom:28px; }
+}
+@media (max-width:480px) {
+  .wrap { padding:28px 16px calc(40px + env(safe-area-inset-bottom)); }
+  .brand { margin-bottom:24px; }
+  .in { gap:10px; padding:8px 0; }
+  .in span { font-size:14px; line-height:1.35; }
+  .step { gap:6px; flex-shrink:0; }
+  .step b, .eur { min-width:36px; }
+  .bon { padding:26px 18px; }
+  .ln { font-size:12.5px; gap:10px; }
+  .ln b { text-align:right; }
+  .contact { margin-top:44px; }
+  .contact h2 { font-size:20px; }
+  .qr-tree canvas { max-width:220px; }
+  .qr-note { right:-4px; }
+}
 </style>
 </head>
 <body>
@@ -83,7 +109,9 @@ body { margin:0; background:var(--bg); color:var(--text); font:15px/1.55 Manrope
   <section class="contact">
     <span class="lbl">Contact</span>
     <h2>Sparren over een inventarisatie voor jou en je team</h2>
-    <p>Scan de code en je zit direct in mijn WhatsApp.</p>
+    <p class="only-mouse">Scan de code en je zit direct in mijn WhatsApp.</p>
+    <p class="only-touch">Tik op de knop en je zit direct in mijn WhatsApp.</p>
+    <a class="cta only-touch" id="cta2" target="_blank" rel="noopener">Stuur me een appje</a>
     <div class="qr-tree"><canvas aria-label="QR-code naar WhatsApp"></canvas><p class="qr-hint">Klik op de boom · <b>scan voor direct WhatsApp-contact met Bob</b></p></div>
   </section>
 </div>
@@ -121,7 +149,7 @@ function update() {
   $('i-rate').style.width = Math.max(2, String($('i-rate').value).length) + 'ch';
   $('r-week').textContent = r.perWeek + ' uur per week'; $('r-month').textContent = eur(r.valMonth); $('r-year').textContent = eur(r.valYear); $('pack').textContent = eur(pack.price);
   const [n, ...u] = r.payback.split(' '); $('r-n').textContent = n; $('r-u').textContent = u.join(' ');
-  $('cta').href = waLink(r, s);
+  $('cta').href = $('cta2').href = waLink(r, s);
 }
 update();
 </script>
@@ -240,6 +268,7 @@ update();
       from = k; to = v; t0 = performance.now();
       if (hint) hint.innerHTML = EN ? (v ? `Scan to WhatsApp Bob directly · <b>click for ${name}</b>` : `Click ${name} · <b>scan to WhatsApp Bob directly</b>`)
         : v ? `Scan voor direct WhatsApp-contact met Bob · <b>klik voor ${name}</b>` : `Klik op ${name} · <b>scan voor direct WhatsApp-contact met Bob</b>`;
+      if (hint && matchMedia('(pointer:coarse)').matches) hint.innerHTML = hint.innerHTML.replace(/Klik/g, 'Tik').replace(/klik/g, 'tik').replace(/Click/g, 'Tap').replace(/click/g, 'tap');
       wrap.classList.toggle('is-qr', !!v);
     }
 
